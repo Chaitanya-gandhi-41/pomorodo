@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { type PomodoroSession } from '@shared/schema';
 
 export type SessionType = 'work' | 'break' | 'longBreak';
 
@@ -35,6 +38,34 @@ const DEFAULT_GOAL_CYCLES = 4;
 const DEFAULT_CYCLES_BEFORE_LONG_BREAK = 4;
 
 export function usePomodoro() {
+  const queryClient = useQueryClient();
+
+  // Fetch session history from API
+  const { data: dbSessionHistory = [] } = useQuery<PomodoroSession[]>({
+    queryKey: ['/api/pomodoro-sessions'],
+    // When the user navigates to history page, the data will be loaded
+    enabled: false,
+  });
+
+  // Create session mutation
+  const createSessionMutation = useMutation({
+    mutationFn: async (session: {
+      type: string;
+      name: string;
+      duration: number;
+      completed: boolean;
+    }) => {
+      return apiRequest<PomodoroSession>('/api/pomodoro-sessions', {
+        method: 'POST',
+        body: JSON.stringify(session),
+      });
+    },
+    onSuccess: () => {
+      // Invalidate sessions query to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/pomodoro-sessions'] });
+    },
+  });
+  
   const [state, setState] = useState<PomodoroState>({
     isRunning: false,
     currentSession: 'work',
@@ -127,6 +158,14 @@ export function usePomodoro() {
             completed: true,
             timestamp: Date.now()
           };
+          
+          // Save session to database
+          createSessionMutation.mutate({
+            type: prev.currentSession,
+            name: prev.sessionName,
+            duration: getSessionDuration(prev.currentSession) * 60 - prev.timeRemaining,
+            completed: true
+          });
           
           // Determine next session type
           let nextSession: SessionType = 'work';
@@ -355,5 +394,7 @@ export function usePomodoro() {
     setSessionName,
     dismissNotification,
     getDefaultSessionName,
+    dbSessionHistory,
+    isLoadingSessionHistory: false,
   };
 }

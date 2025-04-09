@@ -16,9 +16,30 @@ import {
 } from "@/components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { type PomodoroSession } from '@shared/schema';
 
 export default function History() {
-  const { sessionHistory, completedCycles, goalCycles } = usePomodoro();
+  const { completedCycles, goalCycles } = usePomodoro();
+  
+  // Fetch session history from database
+  const { data: dbSessions = [], isLoading } = useQuery<PomodoroSession[]>({
+    queryKey: ['/api/pomodoro-sessions'],
+  });
+  
+  // Use the session history from state as fallback until DB data loads
+  const { sessionHistory: localSessionHistory } = usePomodoro();
+  
+  // Use database sessions if available, otherwise use local sessions
+  const sessionHistory = dbSessions.length > 0 ? 
+    dbSessions.map(session => ({
+      type: session.type as 'work' | 'break' | 'longBreak',
+      name: session.name,
+      duration: session.duration,
+      completed: session.completed,
+      timestamp: new Date(session.timestamp).getTime()
+    })) : 
+    localSessionHistory;
 
   // Prepare data for chart
   const today = new Date();
