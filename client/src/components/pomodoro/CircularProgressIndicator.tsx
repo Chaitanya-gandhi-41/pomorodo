@@ -40,7 +40,11 @@ export default function CircularProgressIndicator({
           fill="none" 
           stroke="currentColor" 
           className={`transition-all duration-1000 ease-in-out ${
-            sessionType === 'work' ? 'text-work' : 'text-break'
+            sessionType === 'work' 
+              ? 'text-work' 
+              : sessionType === 'break'
+                ? 'text-break'
+                : 'text-long-break'
           }`}
           strokeWidth="8"
           strokeLinecap="round"

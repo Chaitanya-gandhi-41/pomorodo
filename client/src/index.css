@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --work-color: #FF8C00;
+    --break-color: #4CAF50;
+    --long-break-color: #2196F3;
+  }
+  
   * {
     @apply border-border;
   }
@@ -10,4 +16,41 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  
+  .text-work {
+    color: var(--work-color);
+  }
+  
+  .text-break {
+    color: var(--break-color);
+  }
+  
+  .text-long-break {
+    color: var(--long-break-color);
+  }
+  
+  .bg-work {
+    background-color: var(--work-color);
+  }
+  
+  .bg-break {
+    background-color: var(--break-color);
+  }
+  
+  .bg-long-break {
+    background-color: var(--long-break-color);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
