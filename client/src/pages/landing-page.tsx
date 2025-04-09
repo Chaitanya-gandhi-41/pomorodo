@@ -19,7 +19,7 @@ export default function LandingPage() {
   
   // If user is logged in, redirect to the main app
   if (user && !isLoading) {
-    return <Redirect to="/" />;
+    return <Redirect to="/app" />;
   }
   
   return (
