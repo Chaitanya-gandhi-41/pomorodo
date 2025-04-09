@@ -27,7 +27,7 @@ export const pomodoroSessions = pgTable("pomodoro_sessions", {
   duration: integer("duration").notNull(), // in milliseconds
   completed: boolean("completed").notNull().default(false),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
-  // We could add a foreign key to users if we implement authentication
+  userId: integer("user_id").references(() => users.id),
 });
 
 export const insertPomodoroSessionSchema = createInsertSchema(pomodoroSessions).pick({
@@ -35,6 +35,7 @@ export const insertPomodoroSessionSchema = createInsertSchema(pomodoroSessions).
   name: true,
   duration: true,
   completed: true,
+  userId: true,
 });
 
 export type InsertPomodoroSession = z.infer<typeof insertPomodoroSessionSchema>;

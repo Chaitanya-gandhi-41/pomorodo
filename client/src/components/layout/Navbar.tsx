@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { Loader2 } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { user, logoutMutation, isLoading } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -52,6 +56,38 @@ export default function Navbar() {
                 History
               </div>
             </Link>
+            
+            <div className="flex items-center ml-4">
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+              ) : user ? (
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    {user.username}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                    title="Logout"
+                  >
+                    {logoutMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <LogOut className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/auth">
+                  <Button variant="outline" size="sm" className="flex items-center">
+                    <User className="h-4 w-4 mr-1" />
+                    Login
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -110,6 +146,47 @@ export default function Navbar() {
                 History
               </div>
             </Link>
+            
+            {/* Mobile auth section */}
+            <div className="border-t border-gray-200 dark:border-gray-700 my-2 pt-2">
+              {isLoading ? (
+                <div className="flex justify-center py-2">
+                  <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+                </div>
+              ) : user ? (
+                <div className="px-3 py-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                      Logged in as <span className="font-semibold">{user.username}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        logoutMutation.mutate();
+                        closeMenu();
+                      }}
+                      disabled={logoutMutation.isPending}
+                      className="ml-2"
+                    >
+                      {logoutMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogOut className="h-4 w-4" />
+                      )}
+                      <span className="ml-1">Logout</span>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Link href="/auth" onClick={closeMenu}>
+                  <div className="px-3 py-2 flex items-center text-gray-600 dark:text-gray-300 hover:text-orange-500">
+                    <User className="h-4 w-4 mr-2" />
+                    <span>Login / Register</span>
+                  </div>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -19,6 +19,8 @@ export interface IStorage {
   // Pomodoro session methods
   createPomodoroSession(session: InsertPomodoroSession): Promise<PomodoroSession>;
   getPomodoroSessions(): Promise<PomodoroSession[]>;
+  getPomodoroSessionsByUserId(userId: number): Promise<PomodoroSession[]>;
+  getPomodoroSessionById(id: number): Promise<PomodoroSession | undefined>;
   updatePomodoroSessionCompleted(id: number, completed: boolean): Promise<PomodoroSession | undefined>;
 }
 
@@ -50,6 +52,21 @@ export class DatabaseStorage implements IStorage {
       .from(pomodoroSessions)
       .orderBy(desc(pomodoroSessions.timestamp))
       .limit(100); // Limit to prevent huge result sets
+  }
+  
+  async getPomodoroSessionsByUserId(userId: number): Promise<PomodoroSession[]> {
+    return await db.select()
+      .from(pomodoroSessions)
+      .where(eq(pomodoroSessions.userId, userId))
+      .orderBy(desc(pomodoroSessions.timestamp))
+      .limit(100); // Limit to prevent huge result sets
+  }
+  
+  async getPomodoroSessionById(id: number): Promise<PomodoroSession | undefined> {
+    const [session] = await db.select()
+      .from(pomodoroSessions)
+      .where(eq(pomodoroSessions.id, id));
+    return session;
   }
   
   async updatePomodoroSessionCompleted(id: number, completed: boolean): Promise<PomodoroSession | undefined> {
