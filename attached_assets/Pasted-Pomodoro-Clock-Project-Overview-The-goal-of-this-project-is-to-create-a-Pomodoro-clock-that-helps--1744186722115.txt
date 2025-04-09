@@ -1,0 +1,57 @@
+Pomodoro Clock
+Project Overview
+The goal of this project is to create a Pomodoro clock that helps users manage their time by
+following the Pomodoro Technique: 25 minutes of focused work followed by a 5-minute break.
+This clock will allow users to customise work and break durations, track completed cycles, and
+alert them when a session ends.
+Project Scope
+1. Frontend: Using React.js (TypeScript optional).
+2. Timer Functionality: A countdown timer for work and break intervals.
+3. Cycle Tracking: Track the number of completed Pomodoro cycles.
+4. Customizable Intervals: Let users adjust the work and break durations.
+Key Features and Requirements
+1. Basic UI Structure
+● Timer Display: Show a countdown timer in MM
+format.
+● Control Buttons: Start, Pause, and Reset buttons to control the timer.
+● Session Label: Display “Work” or “Break” depending on the current timer session.
+● Cycle Counter: Show the number of completed Pomodoro cycles (a cycle includes a
+work session and a break).
+2. Core Timer Functionality
+● Countdown Timer: Start a countdown for 25 minutes by default for work sessions and 5
+minutes for break sessions.
+● Start/Pause: Allow the user to start and pause the timer.
+● Auto-Switch: Automatically switch between work and break sessions when a session
+ends.
+● Reset Button: Reset the timer to the initial settings (25 minutes for work, 5 minutes for
+break).
+● Audio Alert: Play an audio alert at the end of each session to notify the user.
+3. Customizable Intervals
+● Adjustable Settings: Allow users to set custom durations for work and break sessions.
+● Settings Validation: Validate inputs to ensure positive and reasonable time values.
+
+4. Cycle Tracking and Completion
+● Cycle Count: Track the number of completed cycles (one cycle includes one work and
+one break session).
+● Goal Indicator: Optionally, set a goal for the number of cycles (e.g., 4 cycles for a longer
+break).
+Optional Features (If Time Permits)
+● Long Breaks: After a certain number of cycles, add a longer break option (e.g., 15
+minutes).
+● Progress Tracker: Display a simple progress bar showing the completion status of the
+current session.
+● Theme Toggle: Light and dark theme toggle for user preference.
+● Notifications: Display a notification popup at the end of each session.
+Constraints
+● No External Libraries for Core Timer: Use native JavaScript setInterval for countdown
+functionality.
+● Timeline: 1-week deadline with a focus on core Pomodoro timer functionalities.
+Technical Requirements
+● Framework: React.js (TypeScript optional).
+● Styling: Basic CSS for layout and timer visualization.
+● State Management: Use React’s state for managing timer, intervals, and cycle count.
+Deliverables
+● Project Code: A complete code repository with comments and instructions.
+● Deployment Link: Hosted on a platform (e.g., Vercel or Netlify).
+● Documentation: A README file with instructions on using the Pomodoro clock and
+customizing intervals.
