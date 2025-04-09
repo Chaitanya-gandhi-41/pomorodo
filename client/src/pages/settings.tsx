@@ -15,26 +15,31 @@ export default function Settings() {
   const [cyclesBeforeLongBreak, setCyclesBeforeLongBreak] = useState(pomodoro.cyclesBeforeLongBreak);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  // Update the actual settings when our local state changes
-  useEffect(() => {
-    pomodoro.setWorkDuration(workDuration);
-  }, [workDuration, pomodoro]);
+  // Handle immediate update of timer settings
+  const handleWorkDurationChange = (value: number) => {
+    setWorkDuration(value);
+    pomodoro.setWorkDuration(value);
+  };
 
-  useEffect(() => {
-    pomodoro.setBreakDuration(breakDuration);
-  }, [breakDuration, pomodoro]);
+  const handleBreakDurationChange = (value: number) => {
+    setBreakDuration(value);
+    pomodoro.setBreakDuration(value);
+  };
 
-  useEffect(() => {
-    pomodoro.setLongBreakDuration(longBreakDuration);
-  }, [longBreakDuration, pomodoro]);
+  const handleLongBreakDurationChange = (value: number) => {
+    setLongBreakDuration(value);
+    pomodoro.setLongBreakDuration(value);
+  };
 
-  useEffect(() => {
-    pomodoro.setGoalCycles(goalCycles);
-  }, [goalCycles, pomodoro]);
+  const handleGoalCyclesChange = (value: number) => {
+    setGoalCycles(value);
+    pomodoro.setGoalCycles(value);
+  };
 
-  useEffect(() => {
-    pomodoro.setCyclesBeforeLongBreak(cyclesBeforeLongBreak);
-  }, [cyclesBeforeLongBreak, pomodoro]);
+  const handleCyclesBeforeLongBreakChange = (value: number) => {
+    setCyclesBeforeLongBreak(value);
+    pomodoro.setCyclesBeforeLongBreak(value);
+  };
 
   // Handler for requesting notification permissions
   const requestNotificationPermission = async () => {
@@ -89,7 +94,7 @@ export default function Settings() {
                     max={60}
                     step={1}
                     value={[workDuration]}
-                    onValueChange={(value) => setWorkDuration(value[0])}
+                    onValueChange={(value) => handleWorkDurationChange(value[0])}
                     className="flex-1"
                   />
                 </div>
@@ -108,7 +113,7 @@ export default function Settings() {
                     max={30}
                     step={1}
                     value={[breakDuration]}
-                    onValueChange={(value) => setBreakDuration(value[0])}
+                    onValueChange={(value) => handleBreakDurationChange(value[0])}
                     className="flex-1"
                   />
                 </div>
@@ -127,7 +132,7 @@ export default function Settings() {
                     max={60}
                     step={1}
                     value={[longBreakDuration]}
-                    onValueChange={(value) => setLongBreakDuration(value[0])}
+                    onValueChange={(value) => handleLongBreakDurationChange(value[0])}
                     className="flex-1"
                   />
                 </div>
@@ -155,7 +160,7 @@ export default function Settings() {
                     max={10}
                     step={1}
                     value={[goalCycles]}
-                    onValueChange={(value) => setGoalCycles(value[0])}
+                    onValueChange={(value) => handleGoalCyclesChange(value[0])}
                     className="flex-1"
                   />
                 </div>
@@ -174,7 +179,7 @@ export default function Settings() {
                     max={10}
                     step={1}
                     value={[cyclesBeforeLongBreak]}
-                    onValueChange={(value) => setCyclesBeforeLongBreak(value[0])}
+                    onValueChange={(value) => handleCyclesBeforeLongBreakChange(value[0])}
                     className="flex-1"
                   />
                 </div>

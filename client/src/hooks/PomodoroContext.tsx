@@ -1,17 +1,9 @@
-// Original types defined here for backward compatibility
-export type SessionType = 'work' | 'break' | 'longBreak';
-
-// Direct implementation to avoid the context approach which was causing issues
-import { useState, useRef, useEffect } from 'react';
+import { createContext, ReactNode, useContext, useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { type PomodoroSession } from '@shared/schema';
 
-const DEFAULT_WORK_DURATION = 25;
-const DEFAULT_BREAK_DURATION = 5;
-const DEFAULT_LONG_BREAK_DURATION = 15;
-const DEFAULT_GOAL_CYCLES = 4;
-const DEFAULT_CYCLES_BEFORE_LONG_BREAK = 4;
+export type SessionType = 'work' | 'break' | 'longBreak';
 
 interface PomodoroState {
   isRunning: boolean;
@@ -39,38 +31,32 @@ interface PomodoroState {
   }[];
 }
 
-// Create a singleton pattern to maintain state across component renders
-let pomodoroState: PomodoroState = {
-  isRunning: false,
-  currentSession: 'work',
-  sessionName: 'Work Session',
-  timeRemaining: DEFAULT_WORK_DURATION * 60,
-  progress: 0,
-  workDuration: DEFAULT_WORK_DURATION,
-  breakDuration: DEFAULT_BREAK_DURATION,
-  longBreakDuration: DEFAULT_LONG_BREAK_DURATION,
-  completedCycles: 0,
-  goalCycles: DEFAULT_GOAL_CYCLES,
-  cyclesBeforeLongBreak: DEFAULT_CYCLES_BEFORE_LONG_BREAK,
-  notification: {
-    isVisible: false,
-    message: '',
-    type: 'info',
-  },
-  sessionHistory: [],
-};
+const DEFAULT_WORK_DURATION = 25;
+const DEFAULT_BREAK_DURATION = 5;
+const DEFAULT_LONG_BREAK_DURATION = 15;
+const DEFAULT_GOAL_CYCLES = 4;
+const DEFAULT_CYCLES_BEFORE_LONG_BREAK = 4;
 
-// Global timer reference
-let globalTimerRef: number | null = null;
+interface PomodoroContextType extends PomodoroState {
+  formattedTime: string;
+  toggleTimer: () => void;
+  resetTimer: () => void;
+  setWorkDuration: (duration: number) => void;
+  setBreakDuration: (duration: number) => void;
+  setLongBreakDuration: (duration: number) => void;
+  setGoalCycles: (cycles: number) => void;
+  setCyclesBeforeLongBreak: (cycles: number) => void;
+  setSessionName: (name: string) => void;
+  dismissNotification: () => void;
+  getDefaultSessionName: (type: SessionType) => string;
+  dbSessionHistory: PomodoroSession[];
+  isLoadingSessionHistory: boolean;
+}
 
-export function usePomodoro() {
+const PomodoroContext = createContext<PomodoroContextType | null>(null);
+
+export function PomodoroProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
-  const [state, setState] = useState<PomodoroState>(pomodoroState);
-  
-  // Sync with the global state whenever it changes
-  useEffect(() => {
-    pomodoroState = state;
-  }, [state]);
 
   // Fetch session history from API
   const { data: dbSessionHistory = [] } = useQuery<PomodoroSession[]>({
@@ -97,6 +83,26 @@ export function usePomodoro() {
       queryClient.invalidateQueries({ queryKey: ['/api/pomodoro-sessions'] });
     },
   });
+  
+  const [state, setState] = useState<PomodoroState>({
+    isRunning: false,
+    currentSession: 'work',
+    sessionName: 'Work Session',
+    timeRemaining: DEFAULT_WORK_DURATION * 60,
+    progress: 0,
+    workDuration: DEFAULT_WORK_DURATION,
+    breakDuration: DEFAULT_BREAK_DURATION,
+    longBreakDuration: DEFAULT_LONG_BREAK_DURATION,
+    completedCycles: 0,
+    goalCycles: DEFAULT_GOAL_CYCLES,
+    cyclesBeforeLongBreak: DEFAULT_CYCLES_BEFORE_LONG_BREAK,
+    notification: {
+      isVisible: false,
+      message: '',
+      type: 'info',
+    },
+    sessionHistory: [],
+  });
 
   const timerRef = useRef<number | null>(null);
   const workSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -106,9 +112,6 @@ export function usePomodoro() {
   useEffect(() => {
     workSoundRef.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3');
     breakSoundRef.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
-    
-    // Link the local timer ref to the global one
-    timerRef.current = globalTimerRef;
     
     return () => {
       if (timerRef.current) {
@@ -244,9 +247,6 @@ export function usePomodoro() {
       });
     }, 1000);
     
-    // Update the global timer reference
-    globalTimerRef = timerRef.current;
-    
     setState(prev => ({ ...prev, isRunning: true }));
   };
 
@@ -255,7 +255,6 @@ export function usePomodoro() {
     if (timerRef.current !== null) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-      globalTimerRef = null;
     }
     
     setState(prev => ({ ...prev, isRunning: false }));
@@ -266,7 +265,6 @@ export function usePomodoro() {
     if (timerRef.current !== null) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-      globalTimerRef = null;
     }
     
     setState(prev => ({
@@ -407,7 +405,7 @@ export function usePomodoro() {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  return {
+  const value: PomodoroContextType = {
     ...state,
     formattedTime: formatTime(state.timeRemaining),
     toggleTimer,
@@ -423,4 +421,14 @@ export function usePomodoro() {
     dbSessionHistory,
     isLoadingSessionHistory: false,
   };
+
+  return <PomodoroContext.Provider value={value}>{children}</PomodoroContext.Provider>;
+}
+
+export function usePomodoro() {
+  const context = useContext(PomodoroContext);
+  if (!context) {
+    throw new Error('usePomodoro must be used within a PomodoroProvider');
+  }
+  return context;
 }
