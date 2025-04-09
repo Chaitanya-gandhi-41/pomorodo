@@ -36,7 +36,7 @@ export default function AuthPage() {
   
   // Redirect if already logged in
   if (user) {
-    return <Redirect to="/" />;
+    return <Redirect to="/app" />;
   }
   
   // Login form
@@ -70,6 +70,17 @@ export default function AuthPage() {
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Left column with auth form */}
       <div className="flex flex-col justify-center w-full max-w-md p-8 mx-auto">
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center">
+            <div className="flex items-center justify-center w-10 h-10 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 text-white mr-2">
+              <span className="font-bold text-lg">BP</span>
+            </div>
+            <span className="text-xl font-semibold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
+              BeProd
+            </span>
+          </div>
+        </div>
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="login">Login</TabsTrigger>
@@ -117,7 +128,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full"
+                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 hover:from-orange-600 hover:to-amber-600"
                       disabled={loginMutation.isPending}
                     >
                       {loginMutation.isPending ? (
@@ -191,7 +202,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full"
+                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 hover:from-orange-600 hover:to-amber-600"
                       disabled={registerMutation.isPending}
                     >
                       {registerMutation.isPending ? (
