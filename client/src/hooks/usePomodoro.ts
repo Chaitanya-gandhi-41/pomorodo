@@ -279,9 +279,9 @@ export function usePomodoro() {
     if (duration > 60) duration = 60;
     
     setState(prev => {
-      // If timer is not running and current session is work, update time remaining
+      // Always update time remaining when changing the work duration and we're in a work session
       const newTimeRemaining = 
-        !prev.isRunning && prev.currentSession === 'work'
+        prev.currentSession === 'work'
           ? duration * 60
           : prev.timeRemaining;
           
@@ -289,6 +289,8 @@ export function usePomodoro() {
         ...prev,
         workDuration: duration,
         timeRemaining: newTimeRemaining,
+        // Reset progress if we're in a work session
+        progress: prev.currentSession === 'work' ? 0 : prev.progress
       };
     });
   };
@@ -299,9 +301,9 @@ export function usePomodoro() {
     if (duration > 30) duration = 30;
     
     setState(prev => {
-      // If timer is not running and current session is break, update time remaining
+      // Always update time remaining when changing the break duration and we're in a break session
       const newTimeRemaining = 
-        !prev.isRunning && prev.currentSession === 'break'
+        prev.currentSession === 'break'
           ? duration * 60
           : prev.timeRemaining;
           
@@ -309,6 +311,8 @@ export function usePomodoro() {
         ...prev,
         breakDuration: duration,
         timeRemaining: newTimeRemaining,
+        // Reset progress if we're in a break session
+        progress: prev.currentSession === 'break' ? 0 : prev.progress
       };
     });
   };
@@ -330,9 +334,9 @@ export function usePomodoro() {
     if (duration > 60) duration = 60;
     
     setState(prev => {
-      // If timer is not running and current session is longBreak, update time remaining
+      // Always update time remaining when changing the long break duration and we're in a long break session
       const newTimeRemaining = 
-        !prev.isRunning && prev.currentSession === 'longBreak'
+        prev.currentSession === 'longBreak'
           ? duration * 60
           : prev.timeRemaining;
           
@@ -340,6 +344,8 @@ export function usePomodoro() {
         ...prev,
         longBreakDuration: duration,
         timeRemaining: newTimeRemaining,
+        // Reset progress if we're in a long break session
+        progress: prev.currentSession === 'longBreak' ? 0 : prev.progress
       };
     });
   };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,9 +21,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 // Register form schema
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  passwordConfirm: z.string().min(6, "Please confirm your password"),
+  passwordConfirm: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.passwordConfirm, {
   message: "Passwords don't match",
   path: ["passwordConfirm"],
@@ -34,12 +34,7 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
   
-  // Redirect if already logged in
-  if (user) {
-    return <Redirect to="/app" />;
-  }
-  
-  // Login form
+  // Form hooks
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -48,11 +43,6 @@ export default function AuthPage() {
     },
   });
   
-  const onLoginSubmit = (data: LoginFormValues) => {
-    loginMutation.mutate(data);
-  };
-  
-  // Register form
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -62,9 +52,19 @@ export default function AuthPage() {
     },
   });
   
+  // Form handlers
+  const onLoginSubmit = (data: LoginFormValues) => {
+    loginMutation.mutate(data);
+  };
+  
   const onRegisterSubmit = (data: RegisterFormValues) => {
     registerMutation.mutate(data);
   };
+  
+  // Redirect if already logged in
+  if (user) {
+    return <Redirect to="/app" />;
+  }
   
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
